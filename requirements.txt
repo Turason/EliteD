@@ -1,0 +1,26 @@
+# Elite Dangerous AI NPC System - Dependencies
+
+# Core dependencies
+dataclasses-json>=0.6.1  # For serializing data models (if using Python < 3.7)
+
+# AI Service Dependencies (install as needed)
+openai>=1.3.0           # For OpenAI API integration
+anthropic>=0.7.0        # For Anthropic Claude API integration
+aiohttp>=3.8.0          # For local AI service communication
+
+# Optional: For enhanced functionality
+requests>=2.31.0        # For HTTP requests to game data APIs
+python-dotenv>=1.0.0    # For loading environment variables from .env files
+colorama>=0.4.6         # For colored terminal output (Windows compatibility)
+
+# Development/Testing dependencies (optional)
+pytest>=7.0.0           # For unit testing
+pytest-asyncio>=0.21.0  # For testing async functions
+black>=23.0.0           # Code formatting
+flake8>=6.0.0           # Code linting
+
+# Future data collection dependencies (will be needed later)
+# watchdog>=3.0.0       # For monitoring journal files
+# sqlite3                # Built into Python
+# json                   # Built into Python
+# xml.etree.ElementTree  # Built into Python (for some ED data formats)
