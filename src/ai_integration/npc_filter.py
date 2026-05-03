@@ -312,7 +312,7 @@ class NPCFilter:
     
     def get_template(self, npc_type: NPCType) -> NPCPersonality:
         """Get a default personality template for an NPC type."""
-        return self.npc_templates.get(npc_type, self.npc_templates[NPCType.CITIZEN])
+        return self.npc_templates.get(npc_type, self.npc_templates[NPCType.TRADER])
     
     def create_custom_npc(
         self, 

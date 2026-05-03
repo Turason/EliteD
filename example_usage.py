@@ -15,8 +15,9 @@ import argparse
 import sys
 import os
 
-# Add the parent directory to the path so we can import our module
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Add the src directory to the path so we can import our module
+src_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'src')
+sys.path.append(src_path)
 
 from ai_integration import (
     TestRunner, NPCType, EventType,
@@ -178,7 +179,7 @@ def custom_scenario_demo():
     print(f"💡 Tip: Run with --ai to see how Captain Blackbeard would actually talk to you!")
 
 
-def interactive_demo():
+def interactive_demo(api_key=None, provider="openai"):
     """Interactive demo where user can chat with NPCs."""
     print("💬 INTERACTIVE DEMO")
     print("=" * 50)
@@ -191,7 +192,18 @@ def interactive_demo():
     
     # Check if AI is configured
     ai_configured = False
-    if os.getenv('OPENAI_API_KEY'):
+    if api_key:
+        # Use provided API key
+        if provider.lower() == "openai":
+            config = create_openai_config(api_key)
+        elif provider.lower() == "anthropic":
+            config = create_anthropic_config(api_key)
+        else:
+            config = create_local_config()
+        runner.set_ai_config(config)
+        ai_configured = True
+        print(f"🤖 AI detected ({provider.upper()})! You can have real conversations.")
+    elif os.getenv('OPENAI_API_KEY'):
         config = create_openai_config(os.getenv('OPENAI_API_KEY'))
         runner.set_ai_config(config)
         ai_configured = True
@@ -277,7 +289,9 @@ def main():
     
     # Interactive mode
     if args.interactive:
-        interactive_demo()
+        api_key = args.openai_key or args.anthropic_key
+        provider = "anthropic" if args.anthropic_key else "openai"
+        interactive_demo(api_key, provider)
         return
     
     # Custom scenario
