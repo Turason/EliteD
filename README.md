@@ -32,6 +32,23 @@ Create believable NPCs that:
 
 ## 🚀 Quick Start
 
+## 🧭 Command Reference
+
+Use this as a quick lookup for the most common run modes.
+
+| Goal | Command |
+|---|---|
+| Show all options | python example_usage.py --help |
+| Run sample-data demo (no AI) | python example_usage.py |
+| Run live local journal/status ingestion | python example_usage.py --live-data |
+| Run live ingestion with explicit Elite folder path | python example_usage.py --live-data --ed-path "C:/Users/<you>/Saved Games/Frontier Developments/Elite Dangerous" |
+| Run interactive chat (simulated if no key) | python example_usage.py --interactive |
+| Run interactive chat with OpenAI | python example_usage.py --interactive --openai-key "YOUR_OPENAI_KEY" |
+| Run AI demo with OpenAI | python example_usage.py --openai-key "YOUR_OPENAI_KEY" |
+| Run AI demo with Anthropic | python example_usage.py --anthropic-key "YOUR_ANTHROPIC_KEY" |
+| Run local-model mode (requires local model server) | python example_usage.py --local |
+| Run custom scenario demo | python example_usage.py --custom-scenario |
+
 ### 1. Install Dependencies
 ```bash
 pip install -r requirements.txt
@@ -72,6 +89,52 @@ python example_usage.py --live-data
 # Or provide an explicit path:
 python example_usage.py --live-data --ed-path "C:/Users/<you>/Saved Games/Frontier Developments/Elite Dangerous"
 ```
+
+## ✅ First Run Checklist
+
+Follow this once to confirm your setup and data flow are working.
+
+1. Install dependencies
+```bash
+pip install -r requirements.txt
+```
+
+2. Confirm CLI options load
+```bash
+python example_usage.py --help
+```
+
+3. Run baseline demo (no AI, sample data)
+```bash
+python example_usage.py
+```
+
+4. Run live local ingestion demo
+```bash
+python example_usage.py --live-data
+```
+
+5. If your journal folder is non-default, provide it explicitly
+```bash
+python example_usage.py --live-data --ed-path "C:/Users/<you>/Saved Games/Frontier Developments/Elite Dangerous"
+```
+
+6. Verify expected output
+- A detected `Journal*.log` filename
+- Ingestion summary (`events read`, `actions created`, `skipped events`)
+- Commander/location values populated
+- NPC reaction results for Trader/Pirate/Explorer
+
+7. Optional AI response test
+```bash
+python example_usage.py --interactive --openai-key "YOUR_OPENAI_KEY"
+```
+
+8. If something fails, check these first
+- Elite data folder path exists
+- At least one `Journal*.log` file exists
+- `Status.json` may be missing if game/session state has not produced it yet
+- For AI mode, verify API key and model access
 
 ## 🎮 Example Usage
 
