@@ -14,6 +14,7 @@ import asyncio
 import argparse
 import sys
 import os
+from pathlib import Path
 
 # Add the src directory to the path so we can import our module
 src_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'src')
@@ -24,6 +25,74 @@ from ai_integration import (
     create_openai_config, create_anthropic_config, create_local_config,
     quick_test, create_custom_npc_scenario
 )
+from data_ingestion import JournalIngestor
+
+
+def _get_elite_data_path(custom_path: str = None) -> Path:
+    """Resolve Elite Dangerous data directory path."""
+    if custom_path:
+        return Path(custom_path)
+    return Path.home() / "Saved Games" / "Frontier Developments" / "Elite Dangerous"
+
+
+def _get_latest_journal_file(ed_path: Path) -> Path:
+    """Find the newest journal log in the Elite data folder."""
+    journal_files = sorted(ed_path.glob("Journal*.log"), key=lambda p: p.stat().st_mtime)
+    if not journal_files:
+        raise FileNotFoundError(f"No journal files found in {ed_path}")
+    return journal_files[-1]
+
+
+def live_data_demo(ed_path: str = None):
+    """Run filtering tests using real local journal and status data."""
+    print("🛰️ LIVE DATA DEMO - Using local Elite Dangerous logs")
+    print("=" * 50)
+
+    resolved_path = _get_elite_data_path(ed_path)
+    if not resolved_path.exists():
+        print(f"❌ Elite data folder not found: {resolved_path}")
+        print("💡 Use --ed-path to provide your game data folder.")
+        return
+
+    try:
+        journal_file = _get_latest_journal_file(resolved_path)
+    except FileNotFoundError as error:
+        print(f"❌ {error}")
+        return
+
+    ingestor = JournalIngestor()
+    runner = TestRunner()
+
+    print(f"📂 Journal file: {journal_file.name}")
+    player_status, system_state, summary = ingestor.ingest_journal_file(str(journal_file))
+
+    status_file = resolved_path / "Status.json"
+    if status_file.exists():
+        player_status = ingestor.ingest_status_file(str(status_file), player_status)
+        print("✅ Status.json loaded")
+    else:
+        print("ℹ️ Status.json not found, continuing with journal data only")
+
+    # Feed ingested state directly into the existing runner model inputs.
+    runner.sample_data["player_status"] = player_status
+    runner.sample_data["system_state"] = system_state
+
+    print("\nIngestion summary:")
+    print(f"- Events read: {summary.events_read}")
+    print(f"- Actions created: {summary.actions_created}")
+    print(f"- Skipped events: {summary.skipped_events}")
+    print(f"- Commander: {player_status.name}")
+    print(f"- Location: {player_status.current_system}/{player_status.current_station or 'In Space'}")
+
+    print("\nTesting NPC reactions to your real recent activity...")
+    npc_types = ["Test Trader", "Test Pirate", "Test Explorer"]
+    for npc_type in npc_types:
+        print(f"\n--- {npc_type} ---")
+        result = runner.test_npc_filtering(npc_type)
+        print(f"💭 Opinion of player: {result['player_reputation_view']:.2f}")
+        print(f"📋 Relevant actions: {len(result['relevant_actions'])}")
+
+    print("\n✅ Live data demo complete!")
 
 
 def basic_demo():
@@ -274,6 +343,8 @@ def main():
     parser.add_argument("--custom-scenario", action="store_true", help="Run custom scenario demo")
     parser.add_argument("--interactive", action="store_true", help="Interactive chat mode")
     parser.add_argument("--quick", help="Quick test with NPC type (trader, pirate, explorer)")
+    parser.add_argument("--live-data", action="store_true", help="Use real local journal/status data")
+    parser.add_argument("--ed-path", help="Path to Elite Dangerous journal folder")
     
     args = parser.parse_args()
     
@@ -298,6 +369,11 @@ def main():
     if args.custom_scenario:
         custom_scenario_demo()
         return
+
+    # Local journal/status data mode
+    if args.live_data:
+        live_data_demo(args.ed_path)
+        return
     
     # Basic demo (always run)
     basic_demo()
@@ -317,7 +393,7 @@ def main():
     print("1. Try with --openai-key YOUR_KEY for actual AI conversations")
     print("2. Try --custom-scenario for advanced testing")
     print("3. Try --interactive for chat mode")
-    print("4. Integrate with real Elite Dangerous journal data")
+    print("4. Try --live-data to ingest your real Elite Dangerous logs")
     print("5. Build a user interface for the chatbot")
 
 
