@@ -322,7 +322,7 @@ class LocalAIClient:
 
 
 # Utility functions for easy setup
-def create_openai_config(api_key: str, model: str = "gpt-4-turbo-preview") -> AIConfig:
+def create_openai_config(api_key: str, model: str = "gpt-3.5-turbo") -> AIConfig:
     """Create OpenAI configuration."""
     return AIConfig(
         provider=AIProvider.OPENAI,

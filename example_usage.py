@@ -62,7 +62,7 @@ async def ai_demo(api_key: str, provider: str = "openai"):
     
     # Create AI configuration
     if provider.lower() == "openai":
-        config = create_openai_config(api_key, "gpt-3.5-turbo")
+        config = create_openai_config(api_key)
     elif provider.lower() == "anthropic":
         config = create_anthropic_config(api_key)
     else:
