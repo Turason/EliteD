@@ -19,6 +19,11 @@ Create believable NPCs that:
 - **AIService**: Interfaces with OpenAI, Anthropic, or local AI models
 - **TestRunner**: Test system with constructed data
 
+### Current Status: ✅ Initial Data Ingestion Slice (Implemented)
+- **JournalIngestor**: Parses local Elite Dangerous journal logs and maps data into existing models
+- **Status Support**: Reads `Status.json` and applies current-state updates
+- **Live Demo Mode**: Runs NPC filtering using your real local game data
+
 ### Planned Modules:
 1. **Data Collection Layer** - Monitor journal files, fetch market/news data
 2. **Database Layer** - SQLite storage for all game data
@@ -57,6 +62,15 @@ python example_usage.py --interactive --openai-key YOUR_KEY
 ### 5. Custom Scenarios
 ```bash
 python example_usage.py --custom-scenario
+```
+
+### 6. Test with Real Local Game Data (No API Keys Needed)
+```bash
+# Uses default Windows Elite folder:
+python example_usage.py --live-data
+
+# Or provide an explicit path:
+python example_usage.py --live-data --ed-path "C:/Users/<you>/Saved Games/Frontier Developments/Elite Dangerous"
 ```
 
 ## 🎮 Example Usage
@@ -172,28 +186,58 @@ LOG_LEVEL=INFO
 ## 🔧 Development Status
 
 - ✅ **AI Integration Layer**: Complete and tested
-- 🚧 **Data Collection**: Not yet implemented 
+- ✅ **Data Collection (Initial Local Ingestion)**: Implemented (journal + status)
+- 🚧 **Data Collection (Online Enrichment)**: Not yet implemented
 - 🚧 **Database Storage**: Not yet implemented
 - 🚧 **User Interface**: Not yet implemented
-- 🚧 **Real-time Journal Monitoring**: Not yet implemented
+- 🚧 **Real-time Continuous Monitoring**: Not yet implemented
 
 ## 📁 Project Structure
 
 ```
 EliteD/
 ├── src/
-│   └── ai_integration/          # ✅ AI integration module
-│       ├── models.py            # Data structures
-│       ├── npc_filter.py        # NPC personality filtering  
-│       ├── context_builder.py   # AI prompt generation
-│       ├── ai_service.py        # AI provider interfaces
-│       ├── test_runner.py       # Testing framework
-│       ├── config.py            # Configuration management
-│       └── __init__.py          # Package initialization
+│   ├── ai_integration/          # ✅ AI integration module
+│   │   ├── models.py            # Data structures
+│   │   ├── npc_filter.py        # NPC personality filtering  
+│   │   ├── context_builder.py   # AI prompt generation
+│   │   ├── ai_service.py        # AI provider interfaces
+│   │   ├── test_runner.py       # Testing framework
+│   │   ├── config.py            # Configuration management
+│   │   └── __init__.py          # Package initialization
+│   └── data_ingestion/          # ✅ Local data ingestion (initial)
+│       ├── journal_ingestor.py  # Journal/Status parsing to models
+│       └── __init__.py          # Ingestion exports
 ├── example_usage.py             # ✅ Example scripts and demos
 ├── requirements.txt             # ✅ Python dependencies
 └── README.md                    # ✅ This file
 ```
+
+## 📥 Local Data Ingestion Details
+
+The ingestion module maps game data directly into your existing model layer:
+
+- **Input files**:
+    - `Journal*.log` (line-delimited JSON events)
+    - `Status.json` (current cockpit/game state snapshot)
+- **Mapped output models**:
+    - `PlayerStatus`
+    - `SystemState`
+    - `PlayerAction` (appended to `recent_actions`)
+
+### Currently mapped journal events (initial slice)
+- `LoadGame`
+- `Location`, `FSDJump`, `CarrierJump`
+- `Docked`, `Undocked`
+- `Rank`, `Reputation`
+- Mission events: `MissionAccepted`, `MissionCompleted`, `MissionFailed`
+- Trade events: `MarketBuy`, `MarketSell`, `BuyDrones`, `SellDrones`
+- Combat events: `Bounty`, `FactionKillBond`, `Died`, `Interdicted`, `EscapeInterdiction`
+- Exploration events: `Scan`, `ScanOrganic`, `CodexEntry`, `SellExplorationData`
+
+### Note
+- No game login credentials are needed for local journal/status ingestion.
+- API keys are only needed when generating AI responses with OpenAI/Anthropic.
 
 ## 🎯 Next Steps
 
