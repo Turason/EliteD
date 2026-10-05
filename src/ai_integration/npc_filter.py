@@ -112,28 +112,25 @@ class NPCFilter:
         return max(-1.0, min(1.0, sentiment))
     
     def _filter_news(self, npc: NPCPersonality, news: GalacticNews) -> List[Tuple[str, float]]:
-        """Filter galactic news and assign sentiment scores."""
-        relevant_news = []
+        """Evaluate all galactic news for this NPC and assign sentiment scores."""
+        all_news = []
         
-        # Check each news category
+        # Check each news category - all NPCs know all news
         for headline in news.galnet_headlines:
             sentiment = self._evaluate_news_sentiment(npc, headline, "galnet")
-            if abs(sentiment) > 0.1:  # Only include if NPC has opinion
-                relevant_news.append((f"GalNet: {headline}", sentiment))
+            all_news.append((f"GalNet: {headline}", sentiment))
         
         for goal in news.community_goals:
             sentiment = self._evaluate_news_sentiment(npc, goal, "community_goal")
-            if abs(sentiment) > 0.1:
-                relevant_news.append((f"Community Goal: {goal}", sentiment))
+            all_news.append((f"Community Goal: {goal}", sentiment))
         
         for update in news.thargoid_activity:
             sentiment = self._evaluate_news_sentiment(npc, update, "thargoid")
-            if abs(sentiment) > 0.1:
-                relevant_news.append((f"Thargoid Activity: {update}", sentiment))
+            all_news.append((f"Thargoid Activity: {update}", sentiment))
         
-        # Sort by relevance
-        relevant_news.sort(key=lambda x: abs(x[1]), reverse=True)
-        return relevant_news[:5]  # Top 5 most relevant news items
+        # Sort by strength of opinion (strongest first), keeping all news items
+        all_news.sort(key=lambda x: abs(x[1]), reverse=True)
+        return all_news
     
     def _evaluate_news_sentiment(self, npc: NPCPersonality, item: str, category: str) -> float:
         """Evaluate how an NPC feels about a news item."""
@@ -146,13 +143,38 @@ class NPCFilter:
                 sentiment -= 0.8  # Military NPCs concerned about Thargoids
             elif npc.npc_type == NPCType.TRADER:
                 sentiment -= 0.6  # Trade disruption
+            elif npc.npc_type == NPCType.PIRATE:
+                sentiment -= 0.5  # Dangerous alien threat
             elif npc.npc_type == NPCType.EXPLORER:
-                sentiment += 0.3  # Explorers might find them scientifically interesting
+                sentiment += 0.3  # Scientific curiosity
+            else:
+                sentiment -= 0.4
+        
+        # Faction sentiment from news mentions
+        for faction, attitude in npc.faction_attitudes.items():
+            if faction.lower() in item_lower:
+                sentiment += attitude * 0.5
         
         # Keyword-based sentiment
         if "trade" in item_lower or "market" in item_lower:
             if npc.npc_type == NPCType.TRADER:
                 sentiment += 0.5
+            elif npc.npc_type == NPCType.PIRATE:
+                sentiment += 0.3  # Trade routes mean cargo targets
+        
+        if "navy" in item_lower or "patrol" in item_lower or "security" in item_lower:
+            if npc.npc_type == NPCType.PIRATE:
+                sentiment -= 0.6  # Law enforcement tightens
+            elif npc.npc_type in [NPCType.FEDERAL_NAVY, NPCType.IMPERIAL_NAVY, NPCType.BOUNTY_HUNTER]:
+                sentiment += 0.5
+            elif npc.npc_type == NPCType.TRADER:
+                sentiment += 0.4  # Safety
+        
+        if "pirate" in item_lower or "outlaw" in item_lower:
+            if npc.npc_type == NPCType.PIRATE:
+                sentiment += 0.5
+            elif npc.npc_type in [NPCType.BOUNTY_HUNTER, NPCType.TRADER, NPCType.FEDERAL_NAVY]:
+                sentiment -= 0.6
         
         if "war" in item_lower or "conflict" in item_lower:
             if npc.npc_type in [NPCType.BOUNTY_HUNTER, NPCType.PIRATE]:
@@ -160,11 +182,13 @@ class NPCFilter:
             elif npc.npc_type == NPCType.TRADER:
                 sentiment -= 0.5  # War disrupts trade
         
-        if "discovery" in item_lower or "exploration" in item_lower:
+        if "discovery" in item_lower or "exploration" in item_lower or "terraforming" in item_lower:
             if npc.npc_type == NPCType.EXPLORER:
                 sentiment += 0.8
             elif npc.npc_type == NPCType.ENGINEER:
                 sentiment += 0.6
+            elif npc.npc_type == NPCType.TRADER:
+                sentiment += 0.3  # New markets
         
         return max(-1.0, min(1.0, sentiment))
     

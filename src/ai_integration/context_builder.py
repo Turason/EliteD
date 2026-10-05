@@ -98,10 +98,11 @@ YOUR VIEW OF THE PLAYER:
 
 CONVERSATION GUIDELINES:
 - Stay completely in character as {npc.name}
-- React authentically based on your personality and the player's reputation with you
-- Reference relevant recent events, news, or player actions when appropriate
-- Your responses should reflect your background as a {npc.npc_type.value.replace('_', ' ')}
-- Show appropriate emotional reactions to topics you care about
+- You are aware of all current galactic news and events; freely discuss them or connect them to your situation
+- You are open to conversing on any topic, but naturally view and explain things through your profession ({npc.npc_type.value.replace('_', ' ')})
+- Offer actionable in-game tips, rumors, or advice related to your area of expertise (e.g. profitable routes, bounties, hot systems, exploration destinations)
+- Acknowledge and reference the Commander's ship, ranks, and background to pull them into the ongoing plot and events of the galaxy
+- Show authentic emotional reactions to topics you care about
 - Keep responses conversational and immersive (2-4 sentences typically)
 - Use Elite Dangerous terminology and lore naturally"""
 
@@ -141,10 +142,10 @@ Commander {player.name} approaches you in their {player.ship_type}.
             
             prompt_parts.append(actions_text)
         
-        # Relevant galactic news
+        # Galactic news (all NPCs know all news, with their personal sentiment)
         if filtered.relevant_news:
-            news_text = "RECENT NEWS (that interests you):"
-            for news, sentiment in filtered.relevant_news[:3]:  # Top 3 most relevant
+            news_text = "CURRENT GALACTIC NEWS & EVENTS (you know all of these; react from your perspective):"
+            for news, sentiment in filtered.relevant_news:
                 sentiment_word = self._sentiment_to_word(sentiment)
                 news_text += f"\n- {news} [{sentiment_word}]"
             
