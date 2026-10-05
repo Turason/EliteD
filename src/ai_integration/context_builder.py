@@ -7,7 +7,7 @@ to roleplay as a specific NPC with appropriate reactions to game events.
 from typing import Dict, List, Optional
 import json
 from .models import (
-    ConversationContext, NPCPersonality, PlayerStatus, SystemState, 
+    ConversationContext, MissionOffer, NPCPersonality, PlayerStatus, SystemState, 
     GalacticNews, FilteredData, EventType
 )
 
@@ -26,7 +26,8 @@ class ContextBuilder:
         system_state: SystemState,
         galactic_news: GalacticNews,
         filtered_data: FilteredData,
-        conversation_history: List[Dict[str, str]] = None
+        conversation_history: List[Dict[str, str]] = None,
+        available_missions: Optional[List[MissionOffer]] = None
     ) -> ConversationContext:
         """Build complete conversation context for AI."""
         
@@ -36,7 +37,8 @@ class ContextBuilder:
             system_state=system_state,
             galactic_news=galactic_news,
             filtered_data=filtered_data,
-            conversation_history=conversation_history or []
+            conversation_history=conversation_history or [],
+            available_missions=available_missions or []
         )
         
         return context
@@ -101,6 +103,9 @@ CONVERSATION GUIDELINES:
 - You are aware of all current galactic news and events; freely discuss them or connect them to your situation
 - You are open to conversing on any topic, but naturally view and explain things through your profession ({npc.npc_type.value.replace('_', ' ')})
 - Offer actionable in-game tips, rumors, or advice related to your area of expertise (e.g. profitable routes, bounties, hot systems, exploration destinations)
+- When a listed mission suits the conversation, try to persuade the Commander by explaining its concrete benefit to them and how completing it helps you, the issuer, or your faction; ground the justification in the mission briefing and known situation
+- Be persuasive but honest: do not invent rewards, requirements, risks, urgency, or consequences, and do not claim the Commander accepted the mission or that a sample offer is live in-game
+- Make the offer feel natural rather than pitching every mission at once; respect the Commander's choice if they decline
 - Acknowledge and reference the Commander's ship, ranks, and background to pull them into the ongoing plot and events of the galaxy
 - Show authentic emotional reactions to topics you care about
 - Keep responses conversational and immersive (2-4 sentences typically)
@@ -150,6 +155,18 @@ Commander {player.name} approaches you in their {player.ship_type}.
                 news_text += f"\n- {news} [{sentiment_word}]"
             
             prompt_parts.append(news_text)
+
+        if context.available_missions:
+            missions_text = "AVAILABLE SAMPLE MISSION OFFERS (illustrative test data, not accepted missions or a live board):"
+            for mission in context.available_missions:
+                missions_text += (
+                    f"\n- {mission.title} [{mission.mission_type}]"
+                    f"\n  Issuer: {mission.faction}; destination: {mission.destination}"
+                    f"\n  Reward: {mission.reward_credits:,} CR; risk: {mission.risk}"
+                    f"\n  Requirements: {mission.requirements}"
+                    f"\n  Briefing: {mission.briefing}"
+                )
+            prompt_parts.append(missions_text)
         
         # System situation relevance
         if filtered.relevant_system_info:

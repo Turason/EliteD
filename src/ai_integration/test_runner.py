@@ -15,6 +15,7 @@ from .models import (
 from .npc_filter import NPCFilter
 from .context_builder import ContextBuilder
 from .ai_service import AIService, AIConfig, AIProvider, create_openai_config, create_anthropic_config, create_local_config
+from .sample_missions import TEST_MISSIONS
 
 
 class TestRunner:
@@ -93,7 +94,8 @@ class TestRunner:
             self.sample_data["player_status"],
             self.sample_data["system_state"],
             self.sample_data["galactic_news"],
-            filtered_data
+            filtered_data,
+            available_missions=TEST_MISSIONS.get(npc.npc_type, [])
         )
         
         # Create AI prompts
@@ -136,7 +138,8 @@ class TestRunner:
                 self.sample_data["player_status"],
                 self.sample_data["system_state"],
                 self.sample_data["galactic_news"],
-                filtered_data
+                filtered_data,
+                available_missions=TEST_MISSIONS.get(npc.npc_type, [])
             )
             
             # Create prompts
@@ -253,17 +256,25 @@ class TestRunner:
     
     def _get_test_npc(self, name: str) -> NPCPersonality:
         """Get a test NPC, creating one if it doesn't exist."""
-        if name == "Test Trader":
-            return self.npc_filter.get_template(NPCType.TRADER)
-        elif name == "Test Pirate":
-            return self.npc_filter.get_template(NPCType.PIRATE)
-        elif name == "Test Explorer":
-            return self.npc_filter.get_template(NPCType.EXPLORER)
-        else:
-            # Create a custom trader by default
+        test_type_name = name.removeprefix("Test ").strip().lower().replace(" ", "_")
+        try:
+            npc_type = NPCType(test_type_name)
+        except ValueError:
+            # Keep support for named custom test NPCs.
             return self.npc_filter.create_custom_npc(
                 name, NPCType.TRADER, "A generic trader for testing purposes."
             )
+
+        template = self.npc_filter.get_template(npc_type)
+        return NPCPersonality(
+            name=name if name.startswith("Test ") else template.name,
+            npc_type=template.npc_type,
+            background_story=template.background_story,
+            interest_weights=template.interest_weights.copy(),
+            faction_attitudes=template.faction_attitudes.copy(),
+            personality_traits=template.personality_traits.copy(),
+            current_mood=template.current_mood.copy(),
+        )
     
     def _create_sample_data(self) -> Dict:
         """Create sample game data for testing."""

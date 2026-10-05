@@ -91,6 +91,19 @@ class GalacticNews:
 
 
 @dataclass
+class MissionOffer:
+    """A test mission opportunity offered by an NPC or local contact."""
+    title: str
+    mission_type: str
+    briefing: str
+    faction: str
+    destination: str
+    reward_credits: int
+    risk: str
+    requirements: str = "None stated"
+
+
+@dataclass
 class NPCPersonality:
     """Defines an NPC's personality, background, and interests."""
     name: str
@@ -130,6 +143,7 @@ class ConversationContext:
     galactic_news: GalacticNews
     filtered_data: FilteredData
     conversation_history: List[Dict[str, str]] = field(default_factory=list)
+    available_missions: List[MissionOffer] = field(default_factory=list)
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for easy JSON serialization."""
@@ -137,6 +151,19 @@ class ConversationContext:
             "npc_name": self.npc.name,
             "npc_type": self.npc.npc_type.value,
             "npc_background": self.npc.background_story,
+            "available_missions": [
+                {
+                    "title": mission.title,
+                    "type": mission.mission_type,
+                    "briefing": mission.briefing,
+                    "faction": mission.faction,
+                    "destination": mission.destination,
+                    "reward_credits": mission.reward_credits,
+                    "risk": mission.risk,
+                    "requirements": mission.requirements,
+                }
+                for mission in self.available_missions
+            ],
             "player": {
                 "name": self.player_status.name,
                 "location": f"{self.player_status.current_system}/{self.player_status.current_station or 'In Space'}",

@@ -26,7 +26,7 @@ Usage:
 # Core components
 from .models import (
     PlayerAction, PlayerStatus, SystemState, GalacticNews, NPCPersonality,
-    EventType, NPCType, FilteredData, ConversationContext
+    EventType, NPCType, FilteredData, ConversationContext, MissionOffer
 )
 
 from .npc_filter import NPCFilter
@@ -135,6 +135,7 @@ __all__ = [
     "SystemState",
     "GalacticNews",
     "NPCPersonality",
+    "MissionOffer",
     "ConversationContext",
     
     # Enums

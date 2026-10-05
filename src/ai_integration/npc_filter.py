@@ -331,6 +331,98 @@ class NPCFilter:
                 "helpful": 0.7
             }
         )
+
+        templates[NPCType.BOUNTY_HUNTER] = NPCPersonality(
+            name="Default Bounty Hunter",
+            npc_type=NPCType.BOUNTY_HUNTER,
+            background_story="A licensed hunter who tracks wanted criminals and takes dangerous contracts for the reward.",
+            interest_weights={
+                EventType.COMBAT: 1.0,
+                EventType.MISSION: 0.8,
+                EventType.JUMP: 0.4,
+                EventType.REPUTATION_GAIN: 0.6,
+                EventType.REPUTATION_LOSS: 0.5,
+            },
+            faction_attitudes={"Federation": 0.5, "Empire": 0.3, "Alliance": 0.3, "Pirates": -0.9},
+            personality_traits={"persistent": 0.9, "observant": 0.8, "helpful": 0.6},
+        )
+
+        templates[NPCType.FEDERAL_NAVY] = NPCPersonality(
+            name="Default Federal Navy Officer",
+            npc_type=NPCType.FEDERAL_NAVY,
+            background_story="A Federal officer balancing patrol duties, faction security, and the needs of the people under their protection.",
+            interest_weights={
+                EventType.COMBAT: 0.8,
+                EventType.MISSION: 1.0,
+                EventType.REPUTATION_GAIN: 0.9,
+                EventType.REPUTATION_LOSS: 0.8,
+                EventType.JUMP: 0.4,
+            },
+            faction_attitudes={"Federation": 0.9, "Empire": -0.6, "Alliance": 0.1, "Pirates": -0.8},
+            personality_traits={"disciplined": 0.9, "patriotic": 0.8, "helpful": 0.5},
+        )
+
+        templates[NPCType.IMPERIAL_NAVY] = NPCPersonality(
+            name="Default Imperial Navy Officer",
+            npc_type=NPCType.IMPERIAL_NAVY,
+            background_story="An Imperial officer devoted to the Empire, its hierarchy, and the security of its systems.",
+            interest_weights={
+                EventType.COMBAT: 0.8,
+                EventType.MISSION: 1.0,
+                EventType.REPUTATION_GAIN: 0.9,
+                EventType.REPUTATION_LOSS: 0.8,
+                EventType.JUMP: 0.4,
+            },
+            faction_attitudes={"Federation": -0.6, "Empire": 0.9, "Alliance": -0.2, "Pirates": -0.8},
+            personality_traits={"disciplined": 0.8, "proud": 0.9, "helpful": 0.4},
+        )
+
+        templates[NPCType.ALLIANCE] = NPCPersonality(
+            name="Default Alliance Liaison",
+            npc_type=NPCType.ALLIANCE,
+            background_story="An Alliance representative coordinating local aid, diplomacy, and the defense of member systems.",
+            interest_weights={
+                EventType.MISSION: 0.9,
+                EventType.TRADE: 0.7,
+                EventType.COMBAT: 0.6,
+                EventType.REPUTATION_GAIN: 0.8,
+                EventType.REPUTATION_LOSS: 0.7,
+                EventType.EXPLORATION: 0.4,
+            },
+            faction_attitudes={"Federation": 0.1, "Empire": -0.2, "Alliance": 0.9, "Pirates": -0.7},
+            personality_traits={"diplomatic": 0.9, "pragmatic": 0.8, "helpful": 0.7},
+        )
+
+        templates[NPCType.ENGINEER] = NPCPersonality(
+            name="Default Engineer",
+            npc_type=NPCType.ENGINEER,
+            background_story="A technically minded engineer seeking rare materials, useful research data, and capable pilots for workshop jobs.",
+            interest_weights={
+                EventType.EXPLORATION: 0.8,
+                EventType.MISSION: 0.8,
+                EventType.TRADE: 0.6,
+                EventType.COMBAT: 0.3,
+                EventType.JUMP: 0.5,
+            },
+            faction_attitudes={"Federation": 0.1, "Empire": 0.1, "Alliance": 0.1},
+            personality_traits={"curious": 0.9, "practical": 0.8, "helpful": 0.6},
+        )
+
+        templates[NPCType.CITIZEN] = NPCPersonality(
+            name="Default Citizen",
+            npc_type=NPCType.CITIZEN,
+            background_story="A station resident concerned with local safety, reliable supplies, and the fortunes of ordinary people.",
+            interest_weights={
+                EventType.MISSION: 0.8,
+                EventType.TRADE: 0.6,
+                EventType.COMBAT: 0.4,
+                EventType.REPUTATION_GAIN: 0.5,
+                EventType.REPUTATION_LOSS: 0.5,
+                EventType.JUMP: 0.2,
+            },
+            faction_attitudes={"Federation": 0.1, "Empire": 0.0, "Alliance": 0.2, "Pirates": -0.6},
+            personality_traits={"cautious": 0.7, "community-minded": 0.9, "helpful": 0.8},
+        )
         
         return templates
     

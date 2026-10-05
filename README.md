@@ -200,6 +200,18 @@ Each NPC has:
 - **Default Scenario**: Typical commander with mixed recent actions
 - **Custom NPCs**: Create NPCs with specific personalities
 - **Custom Scenarios**: Modify player actions, system state, news
+- **NPC Mission Offers**: Three illustrative offers for each of the nine NPC roles
+
+Mission offers use common Elite Dangerous patterns such as courier, commodity delivery, source-and-return, massacre, assassination, planetary scan, salvage, and passenger missions. They are synthetic test fixtures with illustrative rewards and destinations, not a live mission board.
+
+To inspect the mission offers in the prompt without making an AI API call:
+```python
+runner = TestRunner()
+prompts = runner.test_context_building("Test Imperial Navy")
+print(prompts["user"])
+```
+
+The test runner accepts `Test Trader`, `Test Explorer`, `Test Pirate`, `Test Bounty Hunter`, `Test Federal Navy`, `Test Imperial Navy`, `Test Alliance`, `Test Engineer`, and `Test Citizen`.
 
 ### Test Different Situations
 ```python
@@ -266,6 +278,7 @@ EliteD/
 │   │   ├── context_builder.py   # AI prompt generation
 │   │   ├── ai_service.py        # AI provider interfaces
 │   │   ├── test_runner.py       # Testing framework
+│   │   ├── sample_missions.py   # Role-specific mission test fixtures
 │   │   ├── config.py            # Configuration management
 │   │   └── __init__.py          # Package initialization
 │   └── data_ingestion/          # ✅ Local data ingestion (initial)
